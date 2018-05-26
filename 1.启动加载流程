@@ -9,6 +9,7 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
 在以上自动加载配置的类中，GatewayClassPathWarningAutoConfiguration，GatewayRedisAutoConfiguration, GatewayDiscovRibbonAutoConfiguratioeryClientAutoConfiguration
 都是在GatewayAutoConfiguration加载之后再加载，GatewayLoadBalancerClientAutoConfiguration加载之后记载RibbonAutoConfiguration类。
 下面看下GatewayAutoConfiguration类的加载逻辑
+  注解如下：
   @ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true) 
   应用环境中需要有spring.cloud.gateway.enabled配置，但不是必须的
   
@@ -22,3 +23,14 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
   加载完GatewayAutoConfiguration类之后初始化GatewayLoadBalancerClientAutoConfiguration，GatewayClassPathWarningAutoConfiguration类
   
   @ConditionalOnClass(DispatcherHandler.class)
+  类加载中存在DispatcherHandler.class,才初始化这个bean
+  
+  代码如下：
+  初始化NettyConfiguration这个bean，同时检查类路径中存在HttpClient.class,初始化HttpClient这个bean和Consumer这个bean；
+  初始化HttpClientProperties，NettyRoutingFilter，NettyWriteResponseFilter，ReactorNettyWebSocketClient，RouteLocatorBuilder
+        PropertiesRouteDefinitionLocator(没有则创建)，InMemoryRouteDefinitionRepository(RouteDefinitionRepository(没有则创建))，
+        RouteDefinitionLocator,RouteLocator(RouteDefinitionRouteLocator,CachingRouteLocator(首选bean)),RouteRefreshListener,
+        FilteringWebHandler,RoutePredicateHandlerMapping,GatewayProperties,SecureHeadersProperties,ForwardedHeadersFilter,
+        RemoveHopByHopHeadersFilter,XForwardedHeadersFilter,AdaptCachedBodyGlobalFilter,RouteToRequestUrlFilter
+  
+   
