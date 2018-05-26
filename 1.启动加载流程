@@ -8,3 +8,17 @@ org.springframework.cloud.gateway.config.GatewayRedisAutoConfiguration,\
 org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfiguration
 在以上自动加载配置的类中，GatewayClassPathWarningAutoConfiguration，GatewayRedisAutoConfiguration, GatewayDiscovRibbonAutoConfiguratioeryClientAutoConfiguration
 都是在GatewayAutoConfiguration加载之后再加载，GatewayLoadBalancerClientAutoConfiguration加载之后记载RibbonAutoConfiguration类。
+下面看下GatewayAutoConfiguration类的加载逻辑
+  @ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true) 
+  应用环境中需要有spring.cloud.gateway.enabled配置，但不是必须的
+  
+  @EnableConfigurationProperties
+  应用环境中有带有@ConfigurationProperties的bean提供有效的支持
+  
+  @AutoConfigureBefore(HttpHandlerAutoConfiguration.class)
+  加载GatewayAutoConfiguration类前先加载HttpHandlerAutoConfiguration的bean这里用到webflux
+  
+  @AutoConfigureAfter({GatewayLoadBalancerClientAutoConfiguration.class, GatewayClassPathWarningAutoConfiguration.class})
+  加载完GatewayAutoConfiguration类之后初始化GatewayLoadBalancerClientAutoConfiguration，GatewayClassPathWarningAutoConfiguration类
+  
+  @ConditionalOnClass(DispatcherHandler.class)
