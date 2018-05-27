@@ -30,7 +30,49 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
   初始化HttpClientProperties，NettyRoutingFilter，NettyWriteResponseFilter，ReactorNettyWebSocketClient，RouteLocatorBuilder
         PropertiesRouteDefinitionLocator(没有则创建)，InMemoryRouteDefinitionRepository(RouteDefinitionRepository(没有则创建))，
         RouteDefinitionLocator,RouteLocator(RouteDefinitionRouteLocator,CachingRouteLocator(首选bean)),RouteRefreshListener,
-        FilteringWebHandler,RoutePredicateHandlerMapping,GatewayProperties,SecureHeadersProperties,ForwardedHeadersFilter,
-        RemoveHopByHopHeadersFilter,XForwardedHeadersFilter,AdaptCachedBodyGlobalFilter,RouteToRequestUrlFilter
-  
-   
+        FilteringWebHandler,RoutePredicateHandlerMapping,WebSocketService
+        //ConfigurationProperty beans
+        GatewayProperties,SecureHeadersProperties
+        // HttpHeaderFilter beans
+        ForwardedHeadersFilter,RemoveHopByHopHeadersFilter,XForwardedHeadersFilter
+        // GlobalFilter beans
+        AdaptCachedBodyGlobalFilter,RouteToRequestUrlFilter,ForwardRoutingFilter,ForwardPathFilter,WebsocketRoutingFilter,WeightCalculatorWebFilter
+        // Predicate Factory beans
+        AfterRoutePredicateFactory,BeforeRoutePredicateFactory,BetweenRoutePredicateFactory,CookieRoutePredicateFactory,HeaderRoutePredicateFactory,HostRoutePredicateFactory,MethodRoutePredicateFactory,PathRoutePredicateFactory,QueryRoutePredicateFactory,ReadBodyPredicateFactory,RemoteAddrRoutePredicateFactory,WeightRoutePredicateFactory,AddRequestHeaderGatewayFilterFactory,AddRequestParameterGatewayFilterFactory,AddResponseHeaderGatewayFilterFactory
+        // 初始化熔断器配置，熔断工厂filter
+        @Configuration
+        @ConditionalOnClass({HystrixObservableCommand.class, RxReactiveStreams.class})
+        protected static class HystrixConfiguration {
+          @Bean
+          public HystrixGatewayFilterFactory hystrixGatewayFilterFactory(DispatcherHandler dispatcherHandler) {
+            return new HystrixGatewayFilterFactory(dispatcherHandler);
+          }
+        }
+        ModifyRequestBodyGatewayFilterFactory，ModifyResponseBodyGatewayFilterFactory，PrefixPathGatewayFilterFactory，PreserveHostHeaderGatewayFilterFactory，RedirectToGatewayFilterFactory，RemoveRequestHeaderGatewayFilterFactory，RemoveResponseHeaderGatewayFilterFactory
+        // 初始化限流工厂filter
+        @Bean(name = PrincipalNameKeyResolver.BEAN_NAME)
+        @ConditionalOnBean(RateLimiter.class)
+        public PrincipalNameKeyResolver principalNameKeyResolver() {
+          return new PrincipalNameKeyResolver();
+        }
+
+        @Bean
+        @ConditionalOnBean({RateLimiter.class, KeyResolver.class})
+        public RequestRateLimiterGatewayFilterFactory requestRateLimiterGatewayFilterFactory(RateLimiter rateLimiter, PrincipalNameKeyResolver resolver) {
+          return new RequestRateLimiterGatewayFilterFactory(rateLimiter, resolver);
+        }
+        RewritePathGatewayFilterFactory，RetryGatewayFilterFactory，SetPathGatewayFilterFactory，SecureHeadersGatewayFilterFactory，SetRequestHeaderGatewayFilterFactory，SetResponseHeaderGatewayFilterFactory，SetStatusGatewayFilterFactory，SaveSessionGatewayFilterFactory，StripPrefixGatewayFilterFactory，RequestHeaderToRequestUriGatewayFilterFactory
+        
+        //初始化spring-boot执行器 用于心跳检测
+        @Configuration
+        @ConditionalOnClass(Health.class)
+        protected static class GatewayActuatorConfiguration {
+
+          @Bean
+          @ConditionalOnEnabledEndpoint
+          public GatewayControllerEndpoint gatewayControllerEndpoint(RouteDefinitionLocator routeDefinitionLocator, List<GlobalFilter> globalFilters,
+                                      List<GatewayFilterFactory> GatewayFilters, RouteDefinitionWriter routeDefinitionWriter,
+                                      RouteLocator routeLocator) {
+            return new GatewayControllerEndpoint(routeDefinitionLocator, globalFilters, GatewayFilters, routeDefinitionWriter, routeLocator);
+          }
+        }
