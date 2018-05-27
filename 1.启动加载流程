@@ -45,9 +45,11 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
         HostRoutePredicateFactory,MethodRoutePredicateFactory,PathRoutePredicateFactory,QueryRoutePredicateFactory,ReadBodyPredicateFactory,
         RemoteAddrRoutePredicateFactory,WeightRoutePredicateFactory,
         // 2.WebFilter Facatory
-        AddRequestHeaderGatewayFilterFactory,AddRequestParameterGatewayFilterFactory,AddResponseHeaderGatewayFilterFactory,ModifyRequestBodyGatewayFilterFactory,ModifyResponseBodyGatewayFilterFactory
-        PrefixPathGatewayFilterFactory,PreserveHostHeaderGatewayFilterFactory,RedirectToGatewayFilterFactory,RemoveRequestHeaderGatewayFilterFactory,RemoveResponseHeaderGatewayFilterFactory
-        SetPathGatewayFilterFactory,SecureHeadersGatewayFilterFactory,SetRequestHeaderGatewayFilterFactory,SetResponseHeaderGatewayFilterFactory,SetStatusGatewayFilterFactory,
+        AddRequestHeaderGatewayFilterFactory,AddRequestParameterGatewayFilterFactory,AddResponseHeaderGatewayFilterFactory
+        ModifyRequestBodyGatewayFilterFactory,ModifyResponseBodyGatewayFilterFactory,PrefixPathGatewayFilterFactory,
+        PreserveHostHeaderGatewayFilterFactory,RedirectToGatewayFilterFactory,RemoveRequestHeaderGatewayFilterFactory,
+        RemoveResponseHeaderGatewayFilterFactory,SetPathGatewayFilterFactory,SecureHeadersGatewayFilterFactory,
+        SetRequestHeaderGatewayFilterFactory,SetResponseHeaderGatewayFilterFactory,SetStatusGatewayFilterFactory,
         SaveSessionGatewayFilterFactory,StripPrefixGatewayFilterFactory,RequestHeaderToRequestUriGatewayFilterFactory
         // 3.熔断，限流，重写，重试等Filter Facatory
         // 初始化熔断器配置，熔断工厂filter
