@@ -26,11 +26,13 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
   类加载中存在DispatcherHandler.class,才初始化这个bean
   
   代码如下：
-  初始化NettyConfiguration这个bean，同时检查类路径中存在HttpClient.class,初始化HttpClient这个bean和Consumer这个bean；
-  初始化HttpClientProperties，NettyRoutingFilter，NettyWriteResponseFilter，ReactorNettyWebSocketClient，RouteLocatorBuilder
-        PropertiesRouteDefinitionLocator(没有则创建)，InMemoryRouteDefinitionRepository(RouteDefinitionRepository(没有则创建))，
-        RouteDefinitionLocator,RouteLocator(RouteDefinitionRouteLocator,CachingRouteLocator(首选bean)),RouteRefreshListener,
-        FilteringWebHandler,RoutePredicateHandlerMapping,WebSocketService
+  1.初始化NettyConfiguration这个bean，同时检查类路径中存在HttpClient.class,
+    并在内部初始化HttpClient,Consumer,HttpClientProperties，NettyRoutingFilter，NettyWriteResponseFilter，ReactorNettyWebSocketClient
+    
+  2.初始化RouteLocatorBuilder，PropertiesRouteDefinitionLocator(没有则创建)，
+        InMemoryRouteDefinitionRepository(RouteDefinitionRepository(没有则创建))，RouteDefinitionLocator,
+        RouteLocator(实际初始化bean对象为RouteDefinitionRouteLocator,CachingRouteLocator(首选bean)),RouteRefreshListener,
+        FilteringWebHandler,RoutePredicateHandlerMapping
         //ConfigurationProperty beans
         GatewayProperties,SecureHeadersProperties
         // HttpHeaderFilter beans
@@ -38,7 +40,16 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
         // GlobalFilter beans
         AdaptCachedBodyGlobalFilter,RouteToRequestUrlFilter,ForwardRoutingFilter,ForwardPathFilter,WebsocketRoutingFilter,WeightCalculatorWebFilter
         // Predicate Factory beans
-        AfterRoutePredicateFactory,BeforeRoutePredicateFactory,BetweenRoutePredicateFactory,CookieRoutePredicateFactory,HeaderRoutePredicateFactory,HostRoutePredicateFactory,MethodRoutePredicateFactory,PathRoutePredicateFactory,QueryRoutePredicateFactory,ReadBodyPredicateFactory,RemoteAddrRoutePredicateFactory,WeightRoutePredicateFactory,AddRequestHeaderGatewayFilterFactory,AddRequestParameterGatewayFilterFactory,AddResponseHeaderGatewayFilterFactory
+        // 1.路由Filter Facatory
+        AfterRoutePredicateFactory,BeforeRoutePredicateFactory,BetweenRoutePredicateFactory,CookieRoutePredicateFactory,HeaderRoutePredicateFactory,
+        HostRoutePredicateFactory,MethodRoutePredicateFactory,PathRoutePredicateFactory,QueryRoutePredicateFactory,ReadBodyPredicateFactory,
+        RemoteAddrRoutePredicateFactory,WeightRoutePredicateFactory,
+        // 2.WebFilter Facatory
+        AddRequestHeaderGatewayFilterFactory,AddRequestParameterGatewayFilterFactory,AddResponseHeaderGatewayFilterFactory,ModifyRequestBodyGatewayFilterFactory,ModifyResponseBodyGatewayFilterFactory
+        PrefixPathGatewayFilterFactory,PreserveHostHeaderGatewayFilterFactory,RedirectToGatewayFilterFactory,RemoveRequestHeaderGatewayFilterFactory,RemoveResponseHeaderGatewayFilterFactory
+        SetPathGatewayFilterFactory,SecureHeadersGatewayFilterFactory,SetRequestHeaderGatewayFilterFactory,SetResponseHeaderGatewayFilterFactory,SetStatusGatewayFilterFactory,
+        SaveSessionGatewayFilterFactory,StripPrefixGatewayFilterFactory,RequestHeaderToRequestUriGatewayFilterFactory
+        // 3.熔断，限流，重写，重试等Filter Facatory
         // 初始化熔断器配置，熔断工厂filter
         @Configuration
         @ConditionalOnClass({HystrixObservableCommand.class, RxReactiveStreams.class})
@@ -48,7 +59,7 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
             return new HystrixGatewayFilterFactory(dispatcherHandler);
           }
         }
-        ModifyRequestBodyGatewayFilterFactory，ModifyResponseBodyGatewayFilterFactory，PrefixPathGatewayFilterFactory，PreserveHostHeaderGatewayFilterFactory，RedirectToGatewayFilterFactory，RemoveRequestHeaderGatewayFilterFactory，RemoveResponseHeaderGatewayFilterFactory
+        
         // 初始化限流工厂filter
         @Bean(name = PrincipalNameKeyResolver.BEAN_NAME)
         @ConditionalOnBean(RateLimiter.class)
@@ -61,7 +72,7 @@ org.springframework.cloud.gateway.discovery.GatewayDiscoveryClientAutoConfigurat
         public RequestRateLimiterGatewayFilterFactory requestRateLimiterGatewayFilterFactory(RateLimiter rateLimiter, PrincipalNameKeyResolver resolver) {
           return new RequestRateLimiterGatewayFilterFactory(rateLimiter, resolver);
         }
-        RewritePathGatewayFilterFactory，RetryGatewayFilterFactory，SetPathGatewayFilterFactory，SecureHeadersGatewayFilterFactory，SetRequestHeaderGatewayFilterFactory，SetResponseHeaderGatewayFilterFactory，SetStatusGatewayFilterFactory，SaveSessionGatewayFilterFactory，StripPrefixGatewayFilterFactory，RequestHeaderToRequestUriGatewayFilterFactory
+        RewritePathGatewayFilterFactory,RetryGatewayFilterFactory,
         
         //初始化spring-boot执行器 用于心跳检测
         @Configuration
