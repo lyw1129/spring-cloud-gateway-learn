@@ -1,1 +1,2 @@
-
+gateway中可以定义全局的Filter，也根据路由来定义走那些Filter,我们遇到过这种场景，在特定的某些路由上，需要进行某些拦截，这个时候可以通过路由下配置Filter
+就可以实现，参考GatewayProperties配置类。
